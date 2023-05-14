@@ -6,7 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddSignalR();
-builder.Services.AddScoped<NotifyHub>();
+builder.Services.AddSingleton<NotifyHub>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

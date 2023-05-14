@@ -1,20 +1,21 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 import 'package:signalr_core/signalr_core.dart';
-
 import 'http_overrides.dart';
 
 // The location of the SignalR Server.
-const serverUrl = "https://10.0.2.2:7251/chathub";
+const androidServerUrl = "https://10.0.2.2:7251/chathub";
+const iosServerUrl = "https://localhost:7251/chathub";
 // If you want only to log out the message for the higer level hub protocol:
 final hubProtLogger = Logger("SignalR - hub");
 // If youn want to also to log out transport messages:
 final transportProtLogger = Logger("SignalR - transport");
 
 // Creates the connection by using the HubConnectionBuilder.
-final hubConnection = HubConnectionBuilder().withUrl(serverUrl).build();
+final hubConnection = HubConnectionBuilder()
+    .withUrl(Platform.isAndroid ? androidServerUrl : iosServerUrl)
+    .build();
 
 void main() {
   HttpOverrides.global = MyHttpOverrides();
@@ -53,11 +54,6 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
   String text = "You have pushed the button this many times:";
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
 
   @override
   void initState() {
@@ -72,7 +68,8 @@ class _MyHomePageState extends State<MyHomePage> {
       print("hubConnection started......");
       hubConnection.on("NotifyClient", (arguments) {
         if (arguments != null) {
-          text = arguments.first().toString();
+          text = arguments[0];
+          _counter++;
           setState(() {});
         } else {
           print("Arguments are null");
@@ -93,8 +90,8 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
+            Text(
+              text,
             ),
             Text(
               '$_counter',
@@ -102,11 +99,6 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
       ),
     );
   }
