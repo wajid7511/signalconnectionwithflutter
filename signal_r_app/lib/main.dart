@@ -1,7 +1,10 @@
 import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 import 'package:signalr_core/signalr_core.dart';
+
 import 'http_overrides.dart';
 
 // The location of the SignalR Server.
@@ -22,7 +25,9 @@ void main() {
   Logger.root.level = Level.ALL;
 // Writes the log messages to the console
   Logger.root.onRecord.listen((LogRecord rec) {
-    print('${rec.level.name}: ${rec.time}: ${rec.message}');
+    if (kDebugMode) {
+      print('${rec.level.name}: ${rec.time}: ${rec.message}');
+    }
   });
   WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
@@ -54,6 +59,17 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
   String text = "You have pushed the button this many times:";
+  void _pushMessageToServer() async {
+    try {
+      var platformName = Platform.isAndroid ? "Android" : "Iso";
+      await hubConnection.invoke('GetMessageFromClient',
+          args: ["This message from $platformName"]);
+    } catch (ex) {
+      if (kDebugMode) {
+        print("GetMessageFromClient failed to call $ex");
+      }
+    }
+  }
 
   @override
   void initState() {
@@ -65,18 +81,24 @@ class _MyHomePageState extends State<MyHomePage> {
     try {
       await hubConnection.start();
 
-      print("hubConnection started......");
+      if (kDebugMode) {
+        print("hubConnection started......");
+      }
       hubConnection.on("NotifyClient", (arguments) {
         if (arguments != null) {
           text = arguments[0];
           _counter++;
           setState(() {});
         } else {
-          print("Arguments are null");
+          if (kDebugMode) {
+            print("Arguments are null");
+          }
         }
       });
     } catch (ex) {
-      print("Connection error =>>>>> " + ex.toString());
+      if (kDebugMode) {
+        print("Connection error =>>>>> $ex");
+      }
     }
   }
 
@@ -99,6 +121,11 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ],
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _pushMessageToServer,
+        tooltip: 'Increment',
+        child: const Icon(Icons.add),
       ),
     );
   }

@@ -17,6 +17,10 @@ namespace SignalRApi.Core
             }
             return false;
         }
+        public void GetMessageFromClient(object messgaeFromClient)
+        {
+            Console.WriteLine("MessgaeFromClient => " + messgaeFromClient.ToString());
+        }
     }
 }
 
