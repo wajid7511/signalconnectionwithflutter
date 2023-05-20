@@ -77,7 +77,7 @@ class _MyHomePageState extends State<MyHomePage> {
       final ApiClient apiClient = ApiClient();
       var result = await apiClient.sendBoolAsync<bool>("chat");
       if (kDebugMode) {
-        print("Response from API ${result.toString()}");
+        print("Response from Api => ${result.message}");
       }
     } catch (ex) {
       if (kDebugMode) {

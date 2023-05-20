@@ -1,6 +1,10 @@
 ﻿using System;
+using System.Net;
 using Microsoft.AspNetCore.Mvc;
+using SignalR.Api.Model;
+using SignalR.Core.Abstraction;
 using SignalRApi.Core;
+using SignalRApi.Factory;
 
 namespace SignalRApi.Controllers
 {
@@ -14,10 +18,12 @@ namespace SignalRApi.Controllers
             _notifyHub = notifyHub ?? throw new ArgumentNullException(nameof(notifyHub));
         }
         [HttpPost]
-        public async ValueTask<bool> NotifyClient()
+        [ProducesResponseType(typeof(ApiResponseModel), 200)]
+        public async ValueTask<ApiResponseModel> NotifyClient()
         {
             await _notifyHub.NotifyClient("from other Mobile");
-            return true;
+
+            return ApiResponseFactory.CreateSuccessResponse(LocalizedConsts.SUSSCESS, true);
         }
         [HttpGet]
         public ValueTask<string> IsActive()

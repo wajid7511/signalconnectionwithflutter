@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.AspNetCore.SignalR;
+using SignalR.Api.Model;
 
 namespace SignalRApi.Core
 {
