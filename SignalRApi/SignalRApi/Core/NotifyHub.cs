@@ -8,11 +8,11 @@ namespace SignalRApi.Core
         public NotifyHub()
         {
         }
-        public async ValueTask<bool> NotifyClient()
+        public async ValueTask<bool> NotifyClient(string messag)
         {
             if (Clients != null)
             {
-                await Clients.All.SendAsync("NotifyClient", "This is Asp.Net Core connections");
+                await Clients.All.SendAsync("NotifyClient", $"This is Asp.Net Core connections {messag}");
                 return true;
             }
             return false;

@@ -3,9 +3,10 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
+import 'package:signal_r_app/repositories/client/api_client.dart';
 import 'package:signalr_core/signalr_core.dart';
 
-import 'http_overrides.dart';
+import 'repositories/http_overrides.dart';
 
 // The location of the SignalR Server.
 const androidServerUrl = "https://10.0.2.2:7251/chathub";
@@ -71,6 +72,20 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
+  _notifyAllUsingApi() async {
+    try {
+      final ApiClient apiClient = ApiClient();
+      var result = await apiClient.sendBoolAsync<bool>("chat");
+      if (kDebugMode) {
+        print("Response from API ${result.toString()}");
+      }
+    } catch (ex) {
+      if (kDebugMode) {
+        print("GetMessageFromClient failed to call $ex");
+      }
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -112,6 +127,12 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            TextButton(
+              onPressed: () async {
+                await _notifyAllUsingApi();
+              },
+              child: const Text("Notify All"),
+            ),
             Text(
               text,
             ),

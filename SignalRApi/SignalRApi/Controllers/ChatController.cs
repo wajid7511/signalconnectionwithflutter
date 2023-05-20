@@ -16,7 +16,7 @@ namespace SignalRApi.Controllers
         [HttpPost]
         public async ValueTask<bool> NotifyClient()
         {
-            await _notifyHub.NotifyClient();
+            await _notifyHub.NotifyClient("from other Mobile");
             return true;
         }
         [HttpGet]
