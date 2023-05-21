@@ -28,6 +28,18 @@ namespace SignalRApi.Controllers
 
             return ApiResponseFactory.CreateSuccessResponse(LocalizedConsts.SUSSCESS, true);
         }
+        [HttpPost("NotifyOthers")]
+        [ProducesResponseType(typeof(ApiResponseModel), 200)]
+        public async ValueTask<ApiResponseModel> NotifyOtherClient([FromBody] ChatNotifyPostModel chatNotifyPostModel)
+        {
+            await _chatNotifier.NotifyOther(new ChatDto()
+            {
+                Message = chatNotifyPostModel.Message,
+                ClientId = chatNotifyPostModel.ClientId
+            });
+
+            return ApiResponseFactory.CreateSuccessResponse(LocalizedConsts.SUSSCESS, true);
+        }
         [HttpGet]
         public ValueTask<string> IsActive()
         {

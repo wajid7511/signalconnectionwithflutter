@@ -13,5 +13,10 @@ public class ChatNotifier : IChatNotifier
     {
         return await _notifyHub.NotifyClients(chatDto.Message);
     }
+
+    public async ValueTask<bool> NotifyOther(ChatDto chatDto)
+    {
+        return await _notifyHub.NotifyOtherClients(chatDto);
+    }
 }
 

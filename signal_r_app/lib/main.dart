@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
+import 'package:signal_r_app/abstractions/chat/chat_methods_name.dart';
 import 'package:signal_r_app/abstractions/signal_r_hubs/i_chat_hubs.dart';
 import 'package:signal_r_app/core/chat_service.dart';
 import 'package:signal_r_app/core/signal_r_hubs/hub_service.dart';
@@ -50,9 +51,11 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-  String text = "No one notified yet";
+  String allClientsMessage = "No one notified yet!";
+  String otherClientsMessage = "No one notify you yet!";
   final TextEditingController _controller = TextEditingController(text: '');
+  final TextEditingController _otherClientcontroller =
+      TextEditingController(text: '');
   var sizedBox = const SizedBox(
     height: 20,
   );
@@ -65,7 +68,10 @@ class _MyHomePageState extends State<MyHomePage> {
     _chatService = ChatService();
     _chatHubService = ChatHubService();
     _chatHubService.connectToHub();
-    _chatHubService.onNewMessage("NotifyClient", onMessageRecieved);
+    _chatHubService.onNewMessage(
+        ChatMethodsName.notifyClients, onMessageRecieved);
+    _chatHubService.onNewMessage(
+        ChatMethodsName.notifyOtherClients, onOtherMessageRecieved);
   }
 
   void _pushMessageToServer() async {
@@ -73,10 +79,20 @@ class _MyHomePageState extends State<MyHomePage> {
     _chatHubService.pushMessageToServer("This message from $platformName");
   }
 
-  onMessageRecieved(List<dynamic>? neMessage) {
-    if (neMessage != null) {
-      text = neMessage[0];
-      _counter++;
+  onMessageRecieved(List<dynamic>? newMessage) {
+    if (newMessage != null) {
+      allClientsMessage = newMessage[0];
+      setState(() {});
+    } else {
+      if (kDebugMode) {
+        print("Arguments are null");
+      }
+    }
+  }
+
+  onOtherMessageRecieved(List<dynamic>? newMessage) {
+    if (newMessage != null) {
+      otherClientsMessage = newMessage[0];
       setState(() {});
     } else {
       if (kDebugMode) {
@@ -96,50 +112,82 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            TextButton(
-              onPressed: () async {},
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  SizedBox(
-                    width: MediaQuery.of(context).size.width / 1.2,
-                    child: TextField(
-                      controller: _controller,
-                      decoration: InputDecoration(
-                        suffixIcon: IconButton(
-                          icon: const Icon(Icons.notifications),
-                          onPressed: () async {
-                            var isSuccess =
-                                await _chatService.notifyAll(_controller.text);
-                            if (isSuccess) {
-                              _controller.clear();
-                            }
-                          },
-                        ),
-                        border: const OutlineInputBorder(),
-                        hintText: 'Enter message to notify all',
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                SizedBox(
+                  width: MediaQuery.of(context).size.width / 1.2,
+                  child: TextField(
+                    controller: _controller,
+                    decoration: InputDecoration(
+                      suffixIcon: IconButton(
+                        icon: const Icon(Icons.notifications),
+                        onPressed: () async {
+                          var isSuccess =
+                              await _chatService.notifyAll(_controller.text);
+                          if (isSuccess) {
+                            _controller.clear();
+                          }
+                        },
                       ),
+                      border: const OutlineInputBorder(),
+                      hintText: 'Enter message to notify all',
                     ),
                   ),
-                ],
+                ),
+              ],
+            ),
+            sizedBox,
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                allClientsMessage,
+                style: Theme.of(context).textTheme.headline4,
               ),
             ),
             sizedBox,
-            Text(
-              text,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                SizedBox(
+                  width: MediaQuery.of(context).size.width / 1.2,
+                  child: TextField(
+                    controller: _otherClientcontroller,
+                    decoration: InputDecoration(
+                      suffixIcon: IconButton(
+                        icon: const Icon(Icons.notifications),
+                        onPressed: () async {
+                          var isSuccess = await _chatService.notifyOthers(
+                              _otherClientcontroller.text,
+                              _chatHubService.getClientId());
+                          if (isSuccess) {
+                            _otherClientcontroller.clear();
+                          }
+                        },
+                      ),
+                      border: const OutlineInputBorder(),
+                      hintText: 'Enter message to notify others',
+                    ),
+                  ),
+                ),
+              ],
             ),
             sizedBox,
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                otherClientsMessage,
+                style: Theme.of(context).textTheme.headline5,
+              ),
             ),
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _pushMessageToServer,
-        tooltip: 'Increment',
+        tooltip: 'Push new message to server',
         child: const Icon(Icons.add),
       ),
     );

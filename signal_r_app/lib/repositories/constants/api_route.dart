@@ -7,5 +7,6 @@ class ApiClientRoute {
       Platform.isAndroid ? _androidServerUrl : _iosServerUrl;
 
   static String chatHubUrl() => "${apiBaseUrl()}chathub";
-  final String chatPostUrl = "chat/PostMessage";
+  static String chatUrl() => "chat";
+  static String chatNotifyOthersUrl() => "chat/NotifyOthers";
 }
