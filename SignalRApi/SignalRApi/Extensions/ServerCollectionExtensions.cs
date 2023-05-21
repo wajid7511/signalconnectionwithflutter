@@ -12,7 +12,7 @@ namespace SignalRApi.Extensions
         public static IServiceCollection AddCoreDepencies(this IServiceCollection services)
         {
             services.AddSingleton<NotifyHub>();
-            services.AddScoped<IChatNotifier, ChatNotifier>();
+            services.AddScoped<IChatManager, ChatManager>();
             return services;
         }
         public static IServiceCollection AddSwaggerDepencies(this IServiceCollection services)

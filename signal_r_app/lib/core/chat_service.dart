@@ -19,7 +19,7 @@ class ChatService implements IChatService {
   Future<bool> sendMessageAsync(String absoluteUrl, {Object? body}) async {
     try {
       final ApiClient apiClient = ApiClient();
-      var result = await apiClient.sendBoolAsync<bool>(absoluteUrl, body: body);
+      var result = await apiClient.sendAsync<bool>(absoluteUrl, body: body);
       if (kDebugMode) {
         print("Response from Api => ${result.message}");
       }

@@ -12,8 +12,8 @@ namespace SignalRApi.Controllers
     [Route("[controller]")]
     public class ChatController : ControllerBase
     {
-        private readonly IChatNotifier _chatNotifier;
-        public ChatController(IChatNotifier notifyHub)
+        private readonly IChatManager _chatNotifier;
+        public ChatController(IChatManager notifyHub)
         {
             _chatNotifier = notifyHub ?? throw new ArgumentNullException(nameof(notifyHub));
         }
@@ -21,7 +21,7 @@ namespace SignalRApi.Controllers
         [ProducesResponseType(typeof(ApiResponseModel), 200)]
         public async ValueTask<ApiResponseModel> NotifyClient([FromBody] ChatNotifyPostModel chatNotifyPostModel)
         {
-            await _chatNotifier.NotifyAll(new ChatDto()
+            await _chatNotifier.NotifyAllAsync(new ChatDto()
             {
                 Message = chatNotifyPostModel.Message
             });
@@ -32,18 +32,13 @@ namespace SignalRApi.Controllers
         [ProducesResponseType(typeof(ApiResponseModel), 200)]
         public async ValueTask<ApiResponseModel> NotifyOtherClient([FromBody] ChatNotifyPostModel chatNotifyPostModel)
         {
-            await _chatNotifier.NotifyOther(new ChatDto()
+            await _chatNotifier.NotifyOtherAsync(new ChatDto()
             {
                 Message = chatNotifyPostModel.Message,
                 ClientId = chatNotifyPostModel.ClientId
             });
 
             return ApiResponseFactory.CreateSuccessResponse(LocalizedConsts.SUSSCESS, true);
-        }
-        [HttpGet]
-        public ValueTask<string> IsActive()
-        {
-            return ValueTask.FromResult("ChatHub");
         }
     }
 }
