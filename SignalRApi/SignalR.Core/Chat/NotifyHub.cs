@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Text.Json.Serialization;
 using System.Xml.Linq;
 using Microsoft.AspNetCore.SignalR;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using SignalR.Core.Abstraction;
 
 namespace SignalRApi.Core
@@ -25,7 +28,11 @@ namespace SignalRApi.Core
             if (Clients != null)
             {
                 IReadOnlyList<string> excludedClientIds = new List<string>() { chatDto.ClientId ?? string.Empty };
-                await Clients.AllExcept(excludedClientIds).SendAsync("NotifyOtherClients", chatDto.Message);
+
+                await Clients.AllExcept(excludedClientIds).SendAsync("NotifyOtherClients", JsonConvert.SerializeObject(chatDto, Formatting.Indented, new JsonSerializerSettings
+                {
+                    ContractResolver = new CamelCasePropertyNamesContractResolver()
+                }));
                 return true;
             }
             return false;

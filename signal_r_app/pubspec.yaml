@@ -39,6 +39,7 @@ dependencies:
   signalr_core: any
   logging: ^1.1.1
   dio: any
+  intl: 
 
 dev_dependencies:
   flutter_test:
