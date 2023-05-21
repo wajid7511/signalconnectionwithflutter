@@ -7,13 +7,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Exceptions\" />
-    <None Remove="Chat\" />
-    <None Remove="Chat\Dto\" />
+    <ProjectReference Include="..\SignalR.Core.Abstraction\SignalR.Core.Abstraction.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Exceptions\" />
+    <None Remove="Chat\" />
+  </ItemGroup>
+  <ItemGroup>
     <Folder Include="Chat\" />
-    <Folder Include="Chat\Dto\" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.1.0" />
   </ItemGroup>
 </Project>

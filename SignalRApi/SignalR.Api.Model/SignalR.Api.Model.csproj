@@ -9,4 +9,10 @@
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
+  <ItemGroup>
+    <None Remove="Chat\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Chat\" />
+  </ItemGroup>
 </Project>

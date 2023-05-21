@@ -2,8 +2,8 @@
 using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using SignalR.Api.Model;
+using SignalR.Api.Model.Chat;
 using SignalR.Core.Abstraction;
-using SignalRApi.Core;
 using SignalRApi.Factory;
 
 namespace SignalRApi.Controllers
@@ -12,16 +12,19 @@ namespace SignalRApi.Controllers
     [Route("[controller]")]
     public class ChatController : ControllerBase
     {
-        private readonly NotifyHub _notifyHub;
-        public ChatController(NotifyHub notifyHub)
+        private readonly IChatNotifier _chatNotifier;
+        public ChatController(IChatNotifier notifyHub)
         {
-            _notifyHub = notifyHub ?? throw new ArgumentNullException(nameof(notifyHub));
+            _chatNotifier = notifyHub ?? throw new ArgumentNullException(nameof(notifyHub));
         }
         [HttpPost]
         [ProducesResponseType(typeof(ApiResponseModel), 200)]
-        public async ValueTask<ApiResponseModel> NotifyClient()
+        public async ValueTask<ApiResponseModel> NotifyClient([FromBody] ChatNotifyPostModel chatNotifyPostModel)
         {
-            await _notifyHub.NotifyClient("from other Mobile");
+            await _chatNotifier.NotifyAll(new ChatDto()
+            {
+                Message = chatNotifyPostModel.Message
+            });
 
             return ApiResponseFactory.CreateSuccessResponse(LocalizedConsts.SUSSCESS, true);
         }

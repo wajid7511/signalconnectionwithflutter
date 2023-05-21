@@ -1,6 +1,5 @@
 ﻿using System;
 using Microsoft.AspNetCore.SignalR;
-using SignalR.Api.Model;
 
 namespace SignalRApi.Core
 {
@@ -9,11 +8,11 @@ namespace SignalRApi.Core
         public NotifyHub()
         {
         }
-        public async ValueTask<bool> NotifyClient(string messag)
+        public async ValueTask<bool> NotifyClients(string message)
         {
             if (Clients != null)
             {
-                await Clients.All.SendAsync("NotifyClient", $"This is Asp.Net Core connections {messag}");
+                await Clients.All.SendAsync("NotifyClient", message);
                 return true;
             }
             return false;

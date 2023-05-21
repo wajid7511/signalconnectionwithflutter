@@ -40,11 +40,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Signal Demo',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const MyHomePage(title: 'Signal R'),
     );
   }
 }
@@ -59,7 +59,11 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
-  String text = "You have pushed the button this many times:";
+  String text = "No one notified yet";
+  final TextEditingController _controller = TextEditingController(text: '');
+  var sizedBox = const SizedBox(
+    height: 20,
+  );
   void _pushMessageToServer() async {
     try {
       var platformName = Platform.isAndroid ? "Android" : "Iso";
@@ -75,9 +79,13 @@ class _MyHomePageState extends State<MyHomePage> {
   _notifyAllUsingApi() async {
     try {
       final ApiClient apiClient = ApiClient();
-      var result = await apiClient.sendBoolAsync<bool>("chat");
+      var result = await apiClient
+          .sendBoolAsync<bool>("chat", body: {"message": _controller.text});
       if (kDebugMode) {
         print("Response from Api => ${result.message}");
+      }
+      if (result.isSuccess) {
+        _controller.clear();
       }
     } catch (ex) {
       if (kDebugMode) {
@@ -121,6 +129,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         title: Text(widget.title),
       ),
       body: Center(
@@ -131,11 +140,32 @@ class _MyHomePageState extends State<MyHomePage> {
               onPressed: () async {
                 await _notifyAllUsingApi();
               },
-              child: const Text("Notify All"),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width / 1.2,
+                    child: TextField(
+                      controller: _controller,
+                      decoration: InputDecoration(
+                        suffixIcon: IconButton(
+                          icon: const Icon(Icons.notifications),
+                          onPressed: (() => _notifyAllUsingApi()),
+                        ),
+                        border: const OutlineInputBorder(),
+                        hintText: 'Enter message to notify all',
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
+            sizedBox,
             Text(
               text,
             ),
+            sizedBox,
             Text(
               '$_counter',
               style: Theme.of(context).textTheme.headline4,

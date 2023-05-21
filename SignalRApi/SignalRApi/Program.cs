@@ -1,5 +1,5 @@
 ﻿using Microsoft.OpenApi.Models;
-using SignalRApi.Core;
+using SignalRApi.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,41 +7,17 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddSignalR();
-builder.Services.AddSingleton<NotifyHub>();
-builder.Services.AddSwaggerGen(options =>
-{
-    options.SwaggerDoc("v1", new OpenApiInfo
-    {
-        Version = "v1",
-        Title = "Signal R with Flutter API",
-        Description = "This is developed to connect Mobile app using web api and Signal R",
-
-        Contact = new OpenApiContact
-        {
-            Name = "Wajid Muhammad",
-            Email = "email2wajidkhan@gmail.com"
-        }
-
-    });
-});
+builder.Services.AddCoreDepencies();
+builder.Services.AddSwaggerDepencies();
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 
 app.UseHttpsRedirection();
-
+app.UseSwaggerConfiguration();
 app.UseAuthorization();
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI(options =>
-    {
-        options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
-        options.RoutePrefix = string.Empty;
-    });
-}
 app.MapControllers();
-app.MapHub<NotifyHub>("/chathub");
+app.MapHubs();
 app.Run();
 
