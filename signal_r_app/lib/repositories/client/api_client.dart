@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import '../../exceptions/api_processor_exception.dart';
+import '../../abstractions/exceptions/api_processor_exception.dart';
 import '../constants/api_route.dart';
 import '../interceptors/auth_interceptor.dart';
 import '../models/api_response_model.dart';

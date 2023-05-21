@@ -5,5 +5,7 @@ class ApiClientRoute {
   static const _iosServerUrl = "https://localhost:7251/";
   static String apiBaseUrl() =>
       Platform.isAndroid ? _androidServerUrl : _iosServerUrl;
+
+  static String chatHubUrl() => "${apiBaseUrl()}chathub";
   final String chatPostUrl = "chat/PostMessage";
 }

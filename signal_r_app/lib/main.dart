@@ -1,25 +1,17 @@
 import 'dart:io';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
-import 'package:signal_r_app/repositories/client/api_client.dart';
-import 'package:signalr_core/signalr_core.dart';
-
+import 'package:signal_r_app/abstractions/signal_r_hubs/i_chat_hubs.dart';
+import 'package:signal_r_app/core/chat_service.dart';
+import 'package:signal_r_app/core/signal_r_hubs/hub_service.dart';
+import 'abstractions/chat/i_chat_service.dart';
 import 'repositories/http_overrides.dart';
 
-// The location of the SignalR Server.
-const androidServerUrl = "https://10.0.2.2:7251/chathub";
-const iosServerUrl = "https://localhost:7251/chathub";
 // If you want only to log out the message for the higer level hub protocol:
 final hubProtLogger = Logger("SignalR - hub");
 // If youn want to also to log out transport messages:
 final transportProtLogger = Logger("SignalR - transport");
-
-// Creates the connection by using the HubConnectionBuilder.
-final hubConnection = HubConnectionBuilder()
-    .withUrl(Platform.isAndroid ? androidServerUrl : iosServerUrl)
-    .build();
 
 void main() {
   HttpOverrides.global = MyHttpOverrides();
@@ -64,63 +56,31 @@ class _MyHomePageState extends State<MyHomePage> {
   var sizedBox = const SizedBox(
     height: 20,
   );
-  void _pushMessageToServer() async {
-    try {
-      var platformName = Platform.isAndroid ? "Android" : "Iso";
-      await hubConnection.invoke('GetMessageFromClient',
-          args: ["This message from $platformName"]);
-    } catch (ex) {
-      if (kDebugMode) {
-        print("GetMessageFromClient failed to call $ex");
-      }
-    }
-  }
-
-  _notifyAllUsingApi() async {
-    try {
-      final ApiClient apiClient = ApiClient();
-      var result = await apiClient
-          .sendBoolAsync<bool>("chat", body: {"message": _controller.text});
-      if (kDebugMode) {
-        print("Response from Api => ${result.message}");
-      }
-      if (result.isSuccess) {
-        _controller.clear();
-      }
-    } catch (ex) {
-      if (kDebugMode) {
-        print("GetMessageFromClient failed to call $ex");
-      }
-    }
-  }
+  late IChatService _chatService;
+  late IChatHubService _chatHubService;
 
   @override
   void initState() {
     super.initState();
-    connectToHub();
+    _chatService = ChatService();
+    _chatHubService = ChatHubService();
+    _chatHubService.connectToHub();
+    _chatHubService.onNewMessage("NotifyClient", onMessageRecieved);
   }
 
-  void connectToHub() async {
-    try {
-      await hubConnection.start();
+  void _pushMessageToServer() async {
+    var platformName = Platform.isAndroid ? "Android" : "Iso";
+    _chatHubService.pushMessageToServer("This message from $platformName");
+  }
 
+  onMessageRecieved(List<dynamic>? neMessage) {
+    if (neMessage != null) {
+      text = neMessage[0];
+      _counter++;
+      setState(() {});
+    } else {
       if (kDebugMode) {
-        print("hubConnection started......");
-      }
-      hubConnection.on("NotifyClient", (arguments) {
-        if (arguments != null) {
-          text = arguments[0];
-          _counter++;
-          setState(() {});
-        } else {
-          if (kDebugMode) {
-            print("Arguments are null");
-          }
-        }
-      });
-    } catch (ex) {
-      if (kDebugMode) {
-        print("Connection error =>>>>> $ex");
+        print("Arguments are null");
       }
     }
   }
@@ -137,9 +97,7 @@ class _MyHomePageState extends State<MyHomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             TextButton(
-              onPressed: () async {
-                await _notifyAllUsingApi();
-              },
+              onPressed: () async {},
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -151,7 +109,13 @@ class _MyHomePageState extends State<MyHomePage> {
                       decoration: InputDecoration(
                         suffixIcon: IconButton(
                           icon: const Icon(Icons.notifications),
-                          onPressed: (() => _notifyAllUsingApi()),
+                          onPressed: () async {
+                            var isSuccess =
+                                await _chatService.notifyAll(_controller.text);
+                            if (isSuccess) {
+                              _controller.clear();
+                            }
+                          },
                         ),
                         border: const OutlineInputBorder(),
                         hintText: 'Enter message to notify all',
