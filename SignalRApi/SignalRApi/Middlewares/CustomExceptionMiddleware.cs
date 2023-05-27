@@ -2,6 +2,7 @@
 using System.Text.Json;
 using SignalR.Api.Model;
 using SignalR.Core.Abstraction;
+using SignalR.Shared;
 using SignalRApi.Factory;
 
 namespace SignalRApi.Middlewares
@@ -38,7 +39,7 @@ namespace SignalRApi.Middlewares
                     }
                     else
                     {
-                        response = ApiResponseFactory.CreateErrorResponse(LocalizedConsts.INTERNAL_ERROR, ex.Message, stackTrace: ex.StackTrace);
+                        response = ApiResponseFactory.CreateErrorResponse(ErrorKeys.InternalError, ex.Message, stackTrace: ex.StackTrace);
                     }
                     var json = JsonSerializer.Serialize(response);
                     context.Response.ContentType = "application/json";

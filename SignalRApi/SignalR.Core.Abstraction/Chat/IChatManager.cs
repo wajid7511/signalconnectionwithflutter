@@ -1,4 +1,5 @@
 ﻿using System;
+using SignalR.Core.Abstraction.Chat.Dto;
 
 namespace SignalR.Core.Abstraction
 {
@@ -6,6 +7,7 @@ namespace SignalR.Core.Abstraction
     {
         public ValueTask<bool> NotifyAllAsync(ChatDto chatDto);
         public ValueTask<bool> NotifyOtherAsync(ChatDto chatDto);
+        public ValueTask<bool> CreateChatAsync(CreateChatDto createChatDto);
     }
 }
 

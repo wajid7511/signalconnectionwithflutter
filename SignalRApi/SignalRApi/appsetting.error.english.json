@@ -1,4 +1,5 @@
 ﻿{
     "success": "The request is successfully executed.",
-    "internalError": "An internal server error occurred."
+    "internalError": "An internal server error occurred.",
+    "unableToCreateChat": "Unable to create a chat, please try again."
 }

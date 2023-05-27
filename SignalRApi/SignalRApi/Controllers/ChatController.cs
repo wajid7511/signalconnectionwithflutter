@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 using SignalR.Api.Model;
 using SignalR.Api.Model.Chat;
 using SignalR.Core.Abstraction;
+using SignalR.Core.Abstraction.Chat.Dto;
+using SignalR.Shared;
 using SignalRApi.Factory;
 
 namespace SignalRApi.Controllers
@@ -12,33 +14,45 @@ namespace SignalRApi.Controllers
     [Route("[controller]")]
     public class ChatController : ControllerBase
     {
-        private readonly IChatManager _chatNotifier;
+        private readonly IChatManager _chatManager;
         public ChatController(IChatManager notifyHub)
         {
-            _chatNotifier = notifyHub ?? throw new ArgumentNullException(nameof(notifyHub));
+            _chatManager = notifyHub ?? throw new ArgumentNullException(nameof(notifyHub));
         }
         [HttpPost]
         [ProducesResponseType(typeof(ApiResponseModel), 200)]
         public async ValueTask<ApiResponseModel> NotifyClient([FromBody] ChatNotifyPostModel chatNotifyPostModel)
         {
-            await _chatNotifier.NotifyAllAsync(new ChatDto()
+            await _chatManager.NotifyAllAsync(new ChatDto()
             {
                 Message = chatNotifyPostModel.Message
             });
 
-            return ApiResponseFactory.CreateSuccessResponse(LocalizedConsts.SUSSCESS, true);
+            return ApiResponseFactory.CreateSuccessResponse(ErrorKeys.Success, true);
         }
         [HttpPost("NotifyOthers")]
         [ProducesResponseType(typeof(ApiResponseModel), 200)]
         public async ValueTask<ApiResponseModel> NotifyOtherClient([FromBody] ChatNotifyPostModel chatNotifyPostModel)
         {
-            await _chatNotifier.NotifyOtherAsync(new ChatDto()
+            await _chatManager.NotifyOtherAsync(new ChatDto()
             {
                 Message = chatNotifyPostModel.Message,
                 ClientId = chatNotifyPostModel.ClientId
             });
 
-            return ApiResponseFactory.CreateSuccessResponse(LocalizedConsts.SUSSCESS, true);
+            return ApiResponseFactory.CreateSuccessResponse(ErrorKeys.Success, true);
+        }
+        [HttpPost("Create")]
+        [ProducesResponseType(typeof(ApiResponseModel), 200)]
+        public async ValueTask<ApiResponseModel> CreateChat([FromBody] CreateChatPostModel createChatPostModel)
+        {
+            await _chatManager.CreateChatAsync(new CreateChatDto()
+            {
+                SenderUserId = createChatPostModel.SenderUserId,
+                ReceiverUserId = createChatPostModel.ReceiverUserId
+            });
+
+            return ApiResponseFactory.CreateSuccessResponse(ErrorKeys.Success, true);
         }
     }
 }

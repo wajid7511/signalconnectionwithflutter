@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 using Microsoft.OpenApi.Models;
+using MongoDB.Driver;
 using SignalR.Core;
 using SignalR.Core.Abstraction;
+using SignalR.Database;
+using SignalR.Database.DAL;
 using SignalRApi.Core;
 
 namespace SignalRApi.Extensions
@@ -13,6 +16,14 @@ namespace SignalRApi.Extensions
         {
             services.AddSingleton<NotifyHub>();
             services.AddScoped<IChatManager, ChatManager>();
+            return services;
+        }
+        public static IServiceCollection AddDatabaseDepencies(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.Configure<MongoDatabaseOptions>(configuration.GetSection(MongoDatabaseOptions.CONFIGPATH));
+
+            services.AddScoped<ChatDAL>();
+
             return services;
         }
         public static IServiceCollection AddSwaggerDepencies(this IServiceCollection services)

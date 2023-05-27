@@ -1,5 +1,6 @@
 ﻿using Microsoft.OpenApi.Models;
 using SignalRApi.Extensions;
+using SignalRApi.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddSignalR();
 builder.Services.AddCoreDepencies();
+builder.Services.AddDatabaseDepencies(builder.Configuration);
 builder.Services.AddSwaggerDepencies();
 
 var app = builder.Build();
@@ -16,6 +18,9 @@ var app = builder.Build();
 
 app.UseHttpsRedirection();
 app.UseSwaggerConfiguration();
+
+app.UseMiddleware<CustomExceptionMiddleware>();
+
 app.UseAuthorization();
 app.MapControllers();
 app.MapHubs();

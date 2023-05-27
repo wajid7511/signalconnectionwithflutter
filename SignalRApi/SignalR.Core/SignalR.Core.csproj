@@ -8,6 +8,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SignalR.Core.Abstraction\SignalR.Core.Abstraction.csproj" />
+    <ProjectReference Include="..\SignalR.Database\SignalR.Database.csproj" />
+    <ProjectReference Include="..\SignalR.Shared\SignalR.Shared.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="Chat\" />
