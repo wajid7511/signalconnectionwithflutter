@@ -33,6 +33,21 @@ public class ChatManager : IChatManager
         return result.IsSucess;
     }
 
+    public async ValueTask<bool> CreateChatMessageAsync(CreateChatMessageDto createChatMessageDto)
+    {
+        var result = await _chatDAL.CreateChatMessageAsync(createChatMessageDto.ChatId, new ChatMessage()
+        {
+            ChatMessageId = Helper.GetId(),
+            Message = createChatMessageDto.Message,
+            SenderUserId = createChatMessageDto.SenderUserId,
+        });
+        if (result.IsError)
+        {
+            throw new ManagerProcessException(ErrorKeys.UnableToCreateChatMessage, result.Exception, result.IsError);
+        }
+        return result.IsSucess;
+    }
+
     public async ValueTask<bool> NotifyAllAsync(ChatDto chatDto)
     {
         return await _notifyHub.NotifyClients(chatDto.Message);

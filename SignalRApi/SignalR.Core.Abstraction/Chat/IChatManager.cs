@@ -8,6 +8,7 @@ namespace SignalR.Core.Abstraction
         public ValueTask<bool> NotifyAllAsync(ChatDto chatDto);
         public ValueTask<bool> NotifyOtherAsync(ChatDto chatDto);
         public ValueTask<bool> CreateChatAsync(CreateChatDto createChatDto);
+        public ValueTask<bool> CreateChatMessageAsync(CreateChatMessageDto createChatMessageDto);
     }
 }
 

@@ -41,6 +41,33 @@ namespace SignalR.Database.DAL
                 return new AddDbResult(ex);
             }
         }
+        public async ValueTask<AddDbResult> CreateChatMessageAsync(string chatId, ChatMessage chatMessage)
+        {
+            try
+            {
+                var chat = _chatCollection.Find(f => f.ChatId == chatId && (f.SenderUserId == chatMessage.SenderUserId || f.ReceiverUserId == chatMessage.SenderUserId)).FirstOrDefault();
+
+                if (chat != null)
+                {
+                    chat.Messages.Add(chatMessage);
+                    var filter = Builders<Chat>.Filter.Eq(s => s.ChatId, chatId);
+                    var update = Builders<Chat>.Update.Set(s => s.Messages, chat.Messages);
+                    var updateResult = await _chatCollection.UpdateOneAsync(filter, update);
+                    if (updateResult is not null && updateResult.IsAcknowledged)
+                    {
+                        return new AddDbResult(true);
+                    }
+
+                }
+                return new AddDbResult(new Exception($"Invalid {nameof(chatId)} or {nameof(chatMessage.SenderUserId)}"));
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError("Unable to add new Chat message to chat exception {0}", ex);
+
+                return new AddDbResult(ex);
+            }
+        }
     }
 }
 

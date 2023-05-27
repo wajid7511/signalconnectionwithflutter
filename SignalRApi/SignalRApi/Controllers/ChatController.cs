@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using SignalR.Api.Model;
@@ -50,6 +51,20 @@ namespace SignalRApi.Controllers
             {
                 SenderUserId = createChatPostModel.SenderUserId,
                 ReceiverUserId = createChatPostModel.ReceiverUserId
+            });
+
+            return ApiResponseFactory.CreateSuccessResponse(ErrorKeys.Success, true);
+        }
+
+        [HttpPost("CreateMessage")]
+        [ProducesResponseType(typeof(ApiResponseModel), 200)]
+        public async ValueTask<ApiResponseModel> CreateChat([StringLength(24, MinimumLength = 24)][FromQuery] string chatId, CreateChatMessagePostModel createChatMessagePostModel)
+        {
+            await _chatManager.CreateChatMessageAsync(new CreateChatMessageDto()
+            {
+                ChatId = chatId,
+                SenderUserId = createChatMessagePostModel.SenderUserId,
+                Message = createChatMessagePostModel.Message
             });
 
             return ApiResponseFactory.CreateSuccessResponse(ErrorKeys.Success, true);

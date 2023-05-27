@@ -1,6 +1,7 @@
 ﻿using System;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Driver;
 
 namespace SignalR.Database.Models
 {
@@ -16,6 +17,9 @@ namespace SignalR.Database.Models
 
         [BsonElement("receiverUserId")]
         public int ReceiverUserId { get; set; }
+
+        [BsonElement("messages")]
+        public List<ChatMessage> Messages { get; set; } = new();
     }
 }
 
