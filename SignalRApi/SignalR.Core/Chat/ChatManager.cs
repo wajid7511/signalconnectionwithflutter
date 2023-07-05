@@ -35,17 +35,28 @@ public class ChatManager : IChatManager
 
     public async ValueTask<bool> CreateChatMessageAsync(CreateChatMessageDto createChatMessageDto)
     {
-        var result = await _chatDAL.CreateChatMessageAsync(createChatMessageDto.ChatId, new ChatMessage()
+        var getDbResult = await _chatDAL.GetChatAsync(createChatMessageDto.ChatId, createChatMessageDto.SenderUserId);
+
+        if (getDbResult.IsSucess)
         {
-            ChatMessageId = Helper.GetId(),
-            Message = createChatMessageDto.Message,
-            SenderUserId = createChatMessageDto.SenderUserId,
-        });
-        if (result.IsError)
-        {
-            throw new ManagerProcessException(ErrorKeys.UnableToCreateChatMessage, result.Exception, result.IsError);
+            var result = await _chatDAL.InsertChatMessageAsync(new ChatMessage()
+            {
+                ChatMessageId = Helper.GetId(),
+                ChatId = createChatMessageDto.ChatId,
+                Message = createChatMessageDto.Message,
+                SenderUserId = createChatMessageDto.SenderUserId,
+            });
+            if (result.IsError)
+            {
+                throw new ManagerProcessException(ErrorKeys.UnableToCreateChatMessage, result.Exception, result.IsError);
+            }
+            return result.IsSucess;
         }
-        return result.IsSucess;
+        if (getDbResult.IsError)
+        {
+            throw new ManagerProcessException(ErrorKeys.InvalidChat, getDbResult.Exception, getDbResult.IsError);
+        }
+        return false;
     }
 
     public async ValueTask<bool> NotifyAllAsync(ChatDto chatDto)

@@ -2,5 +2,6 @@
     "success": "The request is successfully executed.",
     "internalError": "An internal server error occurred.",
     "unableToCreateChat": "Unable to create a chat, please try again.",
-    "unableToCreateChatMessage": "Unable to create a chat message, please try again."
+    "unableToCreateChatMessage": "Unable to create a chat message, please try again.",
+    "invalidChat": "Invalid chat detail has been passed."
 }

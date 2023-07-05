@@ -9,12 +9,11 @@ namespace SignalR.Database.DAL
     public class ChatDAL : MongoContext<ChatDAL>
     {
         private readonly IMongoCollection<Chat> _chatCollection = null!;
-        public readonly ILogger<ChatDAL>? _logger = null!;
+        private readonly IMongoCollection<ChatMessage> _chatMessagesCollection = null!;
         public ChatDAL(IOptions<MongoDatabaseOptions> chatDatabaseOptions, ILogger<ChatDAL>? logger) : base(chatDatabaseOptions, logger)
         {
             _chatCollection = base.CreateOrGetCollection<Chat>(chatDatabaseOptions.Value.ChatCollectionName) ?? throw new NullReferenceException(nameof(_chatCollection));
-
-            _logger = logger;
+            _chatMessagesCollection = base.CreateOrGetCollection<ChatMessage>(chatDatabaseOptions.Value.ChatMessageCollectionName) ?? throw new NullReferenceException(nameof(_chatMessagesCollection));
         }
         public async ValueTask<AddDbResult> CreateChatAsync(Chat chat)
         {
@@ -41,31 +40,43 @@ namespace SignalR.Database.DAL
                 return new AddDbResult(ex);
             }
         }
-        public async ValueTask<AddDbResult> CreateChatMessageAsync(string chatId, ChatMessage chatMessage)
+        public async ValueTask<AddDbResult> InsertChatMessageAsync(ChatMessage chatMessage)
         {
             try
             {
-                var chat = _chatCollection.Find(f => f.ChatId == chatId && (f.SenderUserId == chatMessage.SenderUserId || f.ReceiverUserId == chatMessage.SenderUserId)).FirstOrDefault();
-
-                if (chat != null)
+                await _chatMessagesCollection.InsertOneAsync(new ChatMessage()
                 {
-                    chat.Messages.Add(chatMessage);
-                    var filter = Builders<Chat>.Filter.Eq(s => s.ChatId, chatId);
-                    var update = Builders<Chat>.Update.Set(s => s.Messages, chat.Messages);
-                    var updateResult = await _chatCollection.UpdateOneAsync(filter, update);
-                    if (updateResult is not null && updateResult.IsAcknowledged)
-                    {
-                        return new AddDbResult(true);
-                    }
+                    ChatMessageId = chatMessage.ChatMessageId,
+                    ChatId = chatMessage.ChatId,
+                    Message = chatMessage.Message,
+                    SenderUserId = chatMessage.SenderUserId
+                });
+                return new AddDbResult(true);
 
-                }
-                return new AddDbResult(new Exception($"Invalid {nameof(chatId)} or {nameof(chatMessage.SenderUserId)}"));
             }
             catch (Exception ex)
             {
                 _logger?.LogError("Unable to add new Chat message to chat exception {0}", ex);
 
                 return new AddDbResult(ex);
+            }
+        }
+        public async ValueTask<GetDbResult<Chat>> GetChatAsync(string chatId, int senderUserId)
+        {
+            try
+            {
+                var result = await _chatCollection.Find(f => f.ChatId == chatId && (f.SenderUserId == senderUserId || f.ReceiverUserId == senderUserId)).FirstOrDefaultAsync();
+                if (result == null)
+                {
+                    return new GetDbResult<Chat>(new Exception($"Unable to find chat with {nameof(chatId)} and {nameof(senderUserId)}")); ;
+                }
+                return new GetDbResult<Chat>(result);
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError("Unable to get chat with chatId {0} senderUserId {1} exception {2}", chatId, senderUserId, ex);
+
+                return new GetDbResult<Chat>(ex);
             }
         }
     }

@@ -18,8 +18,6 @@ namespace SignalR.Database.Models
         [BsonElement("receiverUserId")]
         public int ReceiverUserId { get; set; }
 
-        [BsonElement("messages")]
-        public List<ChatMessage> Messages { get; set; } = new();
     }
 }
 

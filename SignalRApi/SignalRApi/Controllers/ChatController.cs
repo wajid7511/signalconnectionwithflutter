@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.Net;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SignalR.Api.Model;
 using SignalR.Api.Model.Chat;
@@ -58,7 +59,7 @@ namespace SignalRApi.Controllers
 
         [HttpPost("CreateMessage")]
         [ProducesResponseType(typeof(ApiResponseModel), 200)]
-        public async ValueTask<ApiResponseModel> CreateChat([StringLength(24, MinimumLength = 24)][FromQuery] string chatId, CreateChatMessagePostModel createChatMessagePostModel)
+        public async ValueTask<ApiResponseModel> CreateChatMessage([StringLength(24, MinimumLength = 24)][FromQuery] string chatId, CreateChatMessagePostModel createChatMessagePostModel)
         {
             await _chatManager.CreateChatMessageAsync(new CreateChatMessageDto()
             {

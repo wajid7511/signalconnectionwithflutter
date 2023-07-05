@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.Text.Json.Serialization;
 using System.Xml.Linq;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
@@ -9,6 +10,7 @@ using SignalR.Core.Abstraction;
 
 namespace SignalRApi.Core
 {
+    [Authorize]
     public class NotifyHub : Hub
     {
         public NotifyHub()

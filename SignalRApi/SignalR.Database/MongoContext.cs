@@ -10,10 +10,10 @@ namespace SignalR.Database
 {
     public abstract class MongoContext<T> where T : class
     {
-        public readonly MongoClient mongoClient = null!;
-        public readonly IMongoDatabase mongoDatabase = null!;
+        private readonly MongoClient mongoClient = null!;
+        private readonly IMongoDatabase mongoDatabase = null!;
 
-        public readonly ILogger<T>? _logger;
+        protected readonly ILogger<T>? _logger;
         public MongoContext(IOptions<MongoDatabaseOptions> chatDatabaseOptions, ILogger<T>? logger)
         {
             mongoClient = new MongoClient(chatDatabaseOptions.Value.ConnectionString);

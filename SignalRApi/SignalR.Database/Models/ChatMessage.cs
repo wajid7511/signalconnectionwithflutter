@@ -13,12 +13,17 @@ namespace SignalR.Database.Models
         public string ChatMessageId { get; set; } = null!;
 
         [BsonRequired]
+        [BsonElement("chatId")]
+        public string ChatId { get; set; } = null!;
+
+        [BsonRequired]
+        [BsonElement("senderUserId")]
+        public int SenderUserId { get; set; }
+
+        [BsonRequired]
         [BsonElement("message")]
         [MaxLength(1000)]
         public string Message { get; set; } = string.Empty;
-
-        [BsonElement("senderUserId")]
-        public int SenderUserId { get; set; }
 
         [BsonRepresentation(BsonType.String)]
         public DateTimeOffset CreatedDateTime = DateTimeOffset.UtcNow;

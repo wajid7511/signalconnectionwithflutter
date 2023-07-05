@@ -8,6 +8,7 @@ namespace SignalR.Database
 
         public string DatabaseName { get; set; } = null!;
         public string ChatCollectionName { get; set; } = null!;
+        public string ChatMessageCollectionName { get; set; } = null!;
     }
 }
 
