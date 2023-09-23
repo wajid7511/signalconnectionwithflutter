@@ -7,12 +7,12 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /src
-COPY ["SignalRApi/SignalRApi.csproj", "SignalRApi/"]
-COPY ["SignalR.Api.Model/SignalR.Api.Model.csproj", "SignalR.Api.Model/"]
-COPY ["SignalR.Core.Abstraction/SignalR.Core.Abstraction.csproj", "SignalR.Core.Abstraction/"]
-COPY ["SignalR.Core/SignalR.Core.csproj", "SignalR.Core/"]
-COPY ["SignalR.Database/SignalR.Database.csproj", "SignalR.Database/"]
-COPY ["SignalR.Shared/SignalR.Shared.csproj", "SignalR.Shared/"]
+COPY SignalRApi/SignalRApi.csproj SignalRApi/
+COPY SignalR.Api.Model/SignalR.Api.Model.csproj SignalR.Api.Model/
+COPY SignalR.Core.Abstraction/SignalR.Core.Abstraction.csproj SignalR.Core.Abstraction/
+COPY SignalR.Core/SignalR.Core.csproj SignalR.Core/
+COPY SignalR.Database/SignalR.Database.csproj SignalR.Database/
+COPY SignalR.Shared/SignalR.Shared.csproj SignalR.Shared/
 RUN dotnet restore "SignalRApi/SignalRApi.csproj"
 COPY . .
 WORKDIR "/src/SignalRApi"
