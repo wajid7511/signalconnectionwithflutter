@@ -1,0 +1,8 @@
+version: '3.4'
+
+services:
+  signalrapi:
+    image: ${DOCKER_REGISTRY-}signalrapi
+    build:
+      context: .
+      dockerfile: SignalRApi/Dockerfile
