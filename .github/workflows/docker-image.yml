@@ -15,4 +15,4 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Signal R Docker Build
-      run: docker build . --file ./src/SignalRApi/Dockerfile --tag my-image-name:$(date +%s)
+      run: docker build . --file SignalRApi/Dockerfile --tag my-image-name:$(date +%s)
